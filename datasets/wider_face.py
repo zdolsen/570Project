@@ -60,6 +60,7 @@ class WIDERFace(dataset.Dataset):
         """Load the dataset from the text file."""
 
         if self.split in ("train", "val"):
+            print(path)
             lines = open(path).readlines()
             self.data = []
             idx = 0
