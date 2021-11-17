@@ -11,7 +11,7 @@ CHECKPOINT=weights/checkpoint_50.pth
 main: 
         $(PYTHON) main.py $(TRAINDATA) $(VALDATA) --dataset-root $(ROOT)
 
-main: 
+numworkers: 
         $(PYTHON) testNumWorkers.py $(TRAINDATA) $(VALDATA) --dataset-root $(ROOT)
 
 resume: 
