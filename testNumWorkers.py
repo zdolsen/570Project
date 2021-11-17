@@ -1,4 +1,5 @@
 import argparse
+from datetime import time
 import os
 import os.path as osp
 
@@ -78,17 +79,18 @@ def main():
                                           last_epoch=args.start_epoch-1)
 
     # train and evalute for `epochs`
-    for epoch in range(args.start_epoch, args.epochs):
-        trainer.train(model, loss_fn, optimizer, train_loader, epoch, device=device)
-        scheduler.step()
-
-        if (epoch+1) % args.save_every == 0:
-            trainer.save_checkpoint({
-                'epoch': epoch + 1,
-                'batch_size': train_loader.batch_size,
-                'model': model.state_dict(),
-                'optimizer': optimizer.state_dict()
-            }, filename="checkpoint_{0}.pth".format(epoch+1), save_path=weights_dir)
+    for num_workers in range(0, 20, 1): 
+        args.add_argument("--workers", num_workers)
+        train_loader, _ = get_dataloader(args.traindata, args, num_templates,
+                                     img_transforms=img_transforms)
+        # train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size,
+        # sampler=train_sampler, num_workers=num_workers, pin_memory=pin_memory)
+        start = time.time()
+        for epoch in range(1, 5):
+            for i, data in enumerate(train_loader):
+                pass
+        end = time.time()
+        print("Finish with:{} second, num_workers={}".format(end - start, num_workers))
 
 
 if __name__ == '__main__':
