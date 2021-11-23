@@ -15,16 +15,21 @@ class DetectionModel(nn.Module):
         output = (num_objects + 4)*num_templates
         self.model = base_model(pretrained=True)
 
-        # delete unneeded layer
-        del self.model.layer4
+       
 
         self.score_res3 = nn.Conv2d(in_channels=512, out_channels=output,
                                     kernel_size=1, padding=0)
         self.score_res4 = nn.Conv2d(in_channels=1024, out_channels=output,
                                     kernel_size=1, padding=0)
+        self.score_res5 = nn.Conv2d(in_channels=2048, out_channels=output,
+                                    kernel_size=1, padding=0)
 
         self.score4_upsample = nn.ConvTranspose2d(in_channels=output, out_channels=output,
                                                   kernel_size=4, stride=2, padding=1, bias=False)
+                                                  
+        self.score5_upsample = nn.ConvTranspose2d(in_channels=output, out_channels=output,
+                                                  kernel_size=4, stride=2, padding=1, bias=False)
+                                                  
         self._init_bilinear()
 
     def _init_weights(self):
@@ -81,8 +86,13 @@ class DetectionModel(nn.Module):
 
         score_res4 = self.score_res4(res4)
         score4 = self.score4_upsample(score_res4)
+        
+        x = x = self.model.layer4(x)
+        res5 = x
+        
+        score_res5 = self.score_res5(res5)
+        score5 = self.score5_upsample(score_res5)
 
-        # We need to do some fancy cropping to accomodate the difference in image sizes in eval
         if not self.training:
             # from vl_feats DagNN Crop
             cropv = score4.size(2) - score_res3.size(2)
